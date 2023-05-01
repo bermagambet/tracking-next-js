@@ -11,28 +11,7 @@ import {
 import styles from "@/styles/Home.module.css";
 
 const TrackingList = (props) => {
-  const [posylkas, setPosylkas] = React.useState([
-    {
-      name: 1,
-      pos_id: 1,
-    },
-    {
-      name: 2,
-      pos_id: 2,
-    },
-    {
-      name: 3,
-      pos_id: 3,
-    },
-    {
-      name: 4,
-      pos_id: 4,
-    },
-    {
-      name: 5,
-      pos_id: 5,
-    },
-  ]);
+  const [posylkas, setPosylkas] = React.useState(null);
   const [isEmpty, setIsEmpty] = React.useState(null);
 
   const [searchVal, setSearchVal] = React.useState(null);
