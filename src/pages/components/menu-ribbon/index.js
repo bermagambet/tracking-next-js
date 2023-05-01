@@ -4,6 +4,7 @@ import { Divider, Space } from "antd";
 import {
   HomeOutlined,
   CalculatorOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 
 import styles from "@/styles/Home.module.css";
@@ -18,6 +19,7 @@ const MenuRibbon = (props) => {
     >
       <HomeOutlined onClick={() => setPage(1)} className={styles.home}/>
       <CalculatorOutlined onClick={() => setPage(2)} className={styles.calc}/>
+      <UserOutlined onClick={() => setPage(3)} className={styles.calc}/>
     </Space>
   );
 };
