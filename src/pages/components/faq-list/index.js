@@ -10,8 +10,7 @@ const FaqList = (props) => {
   const [questions, setQuestions] = React.useState([]);
 
   React.useEffect(() => {
-    const { origin } = window.location;
-    fetch(`${origin}/questions`)
+    fetch(`http://api.infriends.kz/questions`)
       .then((r) => r.data)
       .then((rInner) => {
         console.log(rInner);

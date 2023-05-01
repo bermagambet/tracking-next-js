@@ -8,7 +8,6 @@ import TrackingList from "./components/tracking-list";
 import { useState } from "react";
 import { ConfigProvider, theme, Button } from "antd";
 import { Calculator } from "react-mac-calculator";
-import { ReactCalculator } from "simple-react-calculator";
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
@@ -34,7 +33,7 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         {page === 1 && <TrackingList />}
-        <div style={{height: 'auto', width: '25%'}}>{page === 2 && <ReactCalculator />}</div>
+        {page === 2 && <Calculator />}
         <FaqList />
         <MenuRibbon page={page} setPage={setPage} />
         {/* <Button onClick={handleClick}></Button> */}

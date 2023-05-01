@@ -3,9 +3,7 @@ import React from "react";
 import { Divider, Space } from "antd";
 import {
   HomeOutlined,
-  UnorderedListOutlined,
   CalculatorOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 
 import styles from "@/styles/Home.module.css";

@@ -1,0 +1,9 @@
+.calculator-display {
+    background: #1c191c;
+    color: #fff;
+    flex: 1;
+    font-size: 6em;
+    line-height: 130px;
+    position: relative;
+    min-height: 125px;
+}
