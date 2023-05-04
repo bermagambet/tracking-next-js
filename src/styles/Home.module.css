@@ -75,6 +75,10 @@
   padding-right: 25%;
 }
 
+.unauth {
+  color: gray;
+}
+
 .description {
   display: inherit;
   justify-content: inherit;

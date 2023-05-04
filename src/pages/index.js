@@ -14,11 +14,12 @@ const { defaultAlgorithm, darkAlgorithm } = theme;
 
 export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(3);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const handleClick = () => {
     setIsDarkMode((previousValue) => !previousValue);
-   };
+  };
 
   return (
     <ConfigProvider
@@ -27,17 +28,19 @@ export default function Home() {
       }}
     >
       <Head>
-        <title>IncarCargo</title>
-        <meta name="description" content="Прототип трекинг системы" />
+        <title>InfriendsCargo</title>
+        <meta name="description" content="Трекинг системы" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
         {page === 1 && <TrackingList />}
         {page === 2 && <Calculator />}
-        {page === 3 && <Profile />}
+        {page === 3 && (
+          <Profile loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+        )}
         <FaqList />
-        <MenuRibbon page={page} setPage={setPage} />
+        <MenuRibbon page={page} setPage={setPage} loggedIn={loggedIn} />
         {/* <Button onClick={handleClick}></Button> */}
       </main>
     </ConfigProvider>

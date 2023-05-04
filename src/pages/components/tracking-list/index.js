@@ -1,20 +1,31 @@
 import React from "react";
 
-import { Input, Space, Card, Descriptions, Button, Alert, Spin } from "antd";
 import {
-  HomeOutlined,
-  UnorderedListOutlined,
-  CalculatorOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+  Input,
+  Space,
+  Card,
+  Descriptions,
+  Button,
+  Modal,
+  Alert,
+  Row,
+  Form,
+  Col,
+  Spin,
+  message,
+} from "antd";
 
 import styles from "@/styles/Home.module.css";
 
 const TrackingList = (props) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [form] = Form.useForm();
+
   const [posylkas, setPosylkas] = React.useState(null);
   const [isEmpty, setIsEmpty] = React.useState(null);
 
   const [searchVal, setSearchVal] = React.useState(null);
+  const [add, addTrack] = React.useState(false);
 
   React.useEffect(() => {
     fetch(`http://api.infriends.kz/posylkas`)
@@ -35,20 +46,24 @@ const TrackingList = (props) => {
 
   return (
     <Space direction="vertical" className={styles.trackingSpace}>
-      <Input.Search
-        placeholder="Введите трек номер"
-        className={styles.inputs}
-        onChange={onSearch}
-      />
+      <Row className={styles.inputs}>
+        <Col span={20}>
+          <Input.Search placeholder="Введите трек номер" onChange={onSearch} />
+        </Col>
+        <Col span={4}>
+          <Button onClick={() => addTrack(true)}>Добавить</Button>
+        </Col>
+      </Row>
       <Space
         direction="vertical"
         className={posylkas ? styles.trackingSpace2 : styles.trackingSpaceEmpty}
       >
-        {searchVal && searchVal !== ''
+        {searchVal && searchVal !== ""
           ? posylkas
               ?.filter(
                 (x) =>
-                  x.pos_id?.toString()?.includes(searchVal) || x.name?.toString()?.includes(searchVal)
+                  x.pos_id?.toString()?.includes(searchVal) ||
+                  x.name?.toString()?.includes(searchVal)
               )
               .map((x, i) => {
                 return (
@@ -109,6 +124,78 @@ const TrackingList = (props) => {
           </Spin>
         )}
       </Space>
+      <Modal
+        open={add}
+        okText="Создать"
+        cancelText="Отменить создание"
+        onOk={() => form.submit()}
+        onCancel={() => {
+          messageApi.info("Заяявка на создание отменена!");
+          addTrack(false);
+        }}
+      >
+        <Form
+          form={form}
+          onFinish={() => {
+            messageApi.info("Заяявка на создание отправлена!");
+            addTrack(false);
+          }}
+        >
+          <Row gutter={[16, 8]}>
+            <Col span={12}>
+              <Form.Item
+                rules={[
+                  { required: true, message: "Пожалуйста заполните поле" },
+                ]}
+                name="namePos"
+                label="Имя посылки"
+                labelCol={{ span: 24 }}
+              >
+                <Input placeholder="Введите значение..."></Input>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                rules={[
+                  { required: true, message: "Пожалуйста заполните поле" },
+                ]}
+                name="idPos"
+                label="Индекс посылки"
+                labelCol={{ span: 24 }}
+              >
+                <Input placeholder="Введите значение..."></Input>
+              </Form.Item>
+            </Col>
+          </Row>
+          {contextHolder}
+          <Row gutter={[16, 8]}>
+            <Col span={12}>
+              <Form.Item
+                rules={[
+                  { required: true, message: "Пожалуйста заполните поле" },
+                ]}
+                name="weightPos"
+                label="Вес посылки"
+                labelCol={{ span: 24 }}
+              >
+                <Input placeholder="Введите значение..."></Input>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                rules={[
+                  { required: true, message: "Пожалуйста заполните поле" },
+                ]}
+                name="pricePos"
+                label="Цена посылки"
+                labelCol={{ span: 24 }}
+              >
+                <Input placeholder="Введите значение..."></Input>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
     </Space>
   );
 };
