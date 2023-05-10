@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Divider, Space } from "antd";
+import { Button, Divider, Space, Typography } from "antd";
 import {
   HomeOutlined,
   CalculatorOutlined,
@@ -36,6 +36,7 @@ const MenuRibbon = (props) => {
       <HomeOutlined {...homeButtonProps} />
       <CalculatorOutlined {...calcButtonProps} />
       <UserOutlined {...userButtonProps} />
+      <Button style={{justifyContent: 'center', alignSelf: 'center'}} onClick={() => {window.open('http://api.infriends.kz/admin', '_blank');}}>Админ</Button>
     </Space>
   );
 };

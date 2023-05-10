@@ -5,7 +5,7 @@ import styles from "@/styles/Home.module.css";
 import FaqList from "./components/faq-list";
 import TrackingList from "./components/tracking-list";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ConfigProvider, theme, Button } from "antd";
 import { Calculator } from "react-mac-calculator";
 import Profile from "./components/profile";
@@ -15,7 +15,21 @@ const { defaultAlgorithm, darkAlgorithm } = theme;
 export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [page, setPage] = useState(3);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState({
+    loggedIn: false,
+  });
+
+  useEffect(() => {
+    const logTemp = localStorage.getItem("login");
+    const idTemp = localStorage.getItem("id");
+    if (logTemp && idTemp) {
+      setLoggedIn({
+        loggedIn: true,
+        login: logTemp,
+        id: idTemp,
+      });
+    }
+  }, []);
 
   const handleClick = () => {
     setIsDarkMode((previousValue) => !previousValue);
@@ -34,13 +48,17 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        {page === 1 && <TrackingList />}
+        {page === 1 && <TrackingList loggedIn={loggedIn} />}
         {page === 2 && <Calculator />}
         {page === 3 && (
           <Profile loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
         )}
         <FaqList />
-        <MenuRibbon page={page} setPage={setPage} loggedIn={loggedIn} />
+        <MenuRibbon
+          page={page}
+          setPage={setPage}
+          loggedIn={loggedIn?.loggedIn}
+        />
         {/* <Button onClick={handleClick}></Button> */}
       </main>
     </ConfigProvider>

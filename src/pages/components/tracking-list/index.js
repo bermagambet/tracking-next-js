@@ -18,6 +18,7 @@ import {
 import styles from "@/styles/Home.module.css";
 
 const TrackingList = (props) => {
+  const { loggedIn } = props;
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
 
@@ -42,6 +43,38 @@ const TrackingList = (props) => {
 
   const onSearch = (val) => {
     setSearchVal(val.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    fetch(`http://api.infriends.kz/create_order/`, {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        user: loggedIn?.id,
+        pos_id: e?.idPos,
+      }),
+    })
+      .then((r) => r.data)
+      .then(() => {
+        messageApi.success("Заявка на создание отправлена!");
+        addTrack(false);
+        fetch(`http://api.infriends.kz/posylkas`)
+          .then((r) => r.data)
+          .then((rInner) => {
+            setPosylkas(rInner);
+            if (rInner?.length === 0) setIsEmpty(true);
+          })
+          .catch((e) => {
+            console.log(e);
+            setIsEmpty(true);
+          });
+      })
+      .catch((e) => {
+        messageApi.error(`Заявка на создание не отправлена! Ошибка: ${e}`);
+        addTrack(false);
+      });
   };
 
   return (
@@ -136,25 +169,12 @@ const TrackingList = (props) => {
       >
         <Form
           form={form}
-          onFinish={() => {
-            messageApi.info("Заяявка на создание отправлена!");
-            addTrack(false);
+          onFinish={(e) => {
+            handleSubmit(e);
           }}
         >
           <Row gutter={[16, 8]}>
-            <Col span={12}>
-              <Form.Item
-                rules={[
-                  { required: true, message: "Пожалуйста заполните поле" },
-                ]}
-                name="namePos"
-                label="Имя посылки"
-                labelCol={{ span: 24 }}
-              >
-                <Input placeholder="Введите значение..."></Input>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 rules={[
                   { required: true, message: "Пожалуйста заполните поле" },
@@ -168,32 +188,6 @@ const TrackingList = (props) => {
             </Col>
           </Row>
           {contextHolder}
-          <Row gutter={[16, 8]}>
-            <Col span={12}>
-              <Form.Item
-                rules={[
-                  { required: true, message: "Пожалуйста заполните поле" },
-                ]}
-                name="weightPos"
-                label="Вес посылки"
-                labelCol={{ span: 24 }}
-              >
-                <Input placeholder="Введите значение..."></Input>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                rules={[
-                  { required: true, message: "Пожалуйста заполните поле" },
-                ]}
-                name="pricePos"
-                label="Цена посылки"
-                labelCol={{ span: 24 }}
-              >
-                <Input placeholder="Введите значение..."></Input>
-              </Form.Item>
-            </Col>
-          </Row>
         </Form>
       </Modal>
     </Space>

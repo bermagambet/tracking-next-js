@@ -25,30 +25,43 @@ const Profile = (props) => {
   const [log, setLog] = React.useState("");
   const [pass, setPass] = React.useState("");
 
-  const setToReg = () => {
-    setReg(true);
-  };
-
-  const setToLog = () => {
-    setReg(false);
-  };
-
   const handleSubmit = () => {
-    console.log(pass, log);
-    if (pass === "test_user" && log === "test_user") {
-      messageApi.success("Вы успешно вошли!");
-      setLoggedIn(true);
-    } else {
-      messageApi.info(
-        "Сервис временно не доступен или учетные данные неверны!"
-      );
-    }
+    fetch(`http://api.infriends.kz/login/`, {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        login: log,
+        password: pass,
+      }),
+    })
+      .then((r) => r.data)
+      .then((rInner) => {
+        messageApi.success("Вы успешно вошли!");
+        localStorage.setItem("login", log);
+        localStorage.setItem("id", rInner?.user);
+        setLoggedIn({
+          loggedIn: true,
+          login: log,
+          id: rInner?.user,
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+        messageApi.info(
+          "Сервис временно не доступен или учетные данные неверны!"
+        );
+      });
   };
 
   const leave = () => {
     setLog("");
     setPass("");
-    setLoggedIn(false);
+    setLoggedIn({
+      ...loggedIn,
+      loggedIn: false,
+    });
   };
 
   const handleLog = (val) => {
@@ -101,25 +114,22 @@ const Profile = (props) => {
   return (
     <Card>
       {contextHolder}
-      {loggedIn && (
+      {loggedIn?.loggedIn && (
         <div>
           <Space direction="vertical" style={{ width: "100%" }}>
             <Descriptions bordered>
               <Descriptions.Item label="Ваш логин" span={1}>
-                test_user
+                {loggedIn?.login}
               </Descriptions.Item>
-              <Descriptions.Item label="Ваш пароль" span={1}>
-                <Input.Password value={"test_user"}></Input.Password>
-              </Descriptions.Item>
-              <Descriptions.Item label="Ваша почта" span={1}>
-                test_user@gmail.com
+              <Descriptions.Item label="Ваш ID" span={1}>
+                {loggedIn?.id}
               </Descriptions.Item>
             </Descriptions>
             <Button onClick={leave}>Выйти</Button>
           </Space>
         </div>
       )}
-      {!loggedIn && node}
+      {!loggedIn?.loggedIn && node}
     </Card>
   );
 };
