@@ -10,15 +10,15 @@ import {
 import styles from "@/styles/Home.module.css";
 
 const MenuRibbon = (props) => {
-  const { page, setPage, loggedIn } = props;
+  const { page, setPage, loggedIn, admin } = props;
 
   const homeButtonProps = {
-    onClick: loggedIn  ? () => setPage(1) : () => null,
+    onClick: loggedIn ? () => setPage(1) : () => null,
     className: loggedIn ? styles.home : styles.unauth,
   };
 
   const calcButtonProps = {
-    onClick: loggedIn  ? () => setPage(2) : () => null,
+    onClick: loggedIn ? () => setPage(2) : () => null,
     className: loggedIn ? styles.calc : styles.unauth,
   };
 
@@ -36,7 +36,21 @@ const MenuRibbon = (props) => {
       <HomeOutlined {...homeButtonProps} />
       <CalculatorOutlined {...calcButtonProps} />
       <UserOutlined {...userButtonProps} />
-      <Button style={{justifyContent: 'center', alignSelf: 'center'}} onClick={() => {window.open('http://api.infriends.kz/admin/', '_blank');}}>Админ</Button>
+      <Button
+        style={{ justifyContent: "center", alignSelf: "center" }}
+        onClick={() => {
+          window.open("http://api.infriends.kz/admin/", "_blank");
+        }}
+      >
+        Админ
+      </Button>
+      <Button
+        style={{ justifyContent: "center", alignSelf: "center" }}
+        onClick={loggedIn && admin ? () => setPage(4) : () => null}
+        disabled={!admin}
+      >
+        Админ - Добавление посылок
+      </Button>
     </Space>
   );
 };

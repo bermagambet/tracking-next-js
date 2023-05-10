@@ -43,8 +43,8 @@ const Profile = (props) => {
         console.log(rInner);
         if (rInner?.Msg !== "Bad Login or password") {
           messageApi.success("Вы успешно вошли!");
-          localStorage.setItem("login", log);
-          localStorage.setItem("id", rInner?.user);
+          window.sessionStorage.setItem("login", log);
+          window.sessionStorage.setItem("id", rInner?.user);
           setLoggedIn({
             loggedIn: true,
             login: log,
@@ -70,6 +70,8 @@ const Profile = (props) => {
   const leave = () => {
     setLog("");
     setPass("");
+    window.sessionStorage.setItem("login", null);
+    window.sessionStorage.setItem("id", null);
     setLoggedIn({
       ...loggedIn,
       loggedIn: false,
