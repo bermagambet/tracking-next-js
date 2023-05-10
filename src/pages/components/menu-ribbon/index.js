@@ -36,7 +36,7 @@ const MenuRibbon = (props) => {
       <HomeOutlined {...homeButtonProps} />
       <CalculatorOutlined {...calcButtonProps} />
       <UserOutlined {...userButtonProps} />
-      <Button style={{justifyContent: 'center', alignSelf: 'center'}} onClick={() => {window.open('http://api.infriends.kz/admin', '_blank');}}>Админ</Button>
+      <Button style={{justifyContent: 'center', alignSelf: 'center'}} onClick={() => {window.open('http://api.infriends.kz/admin/', '_blank');}}>Админ</Button>
     </Space>
   );
 };

@@ -11,6 +11,7 @@ import {
   Descriptions,
   Space,
   message,
+  Spin,
 } from "antd";
 
 const { Panel } = Collapse;
@@ -18,7 +19,7 @@ const { Panel } = Collapse;
 import styles from "@/styles/Home.module.css";
 
 const Profile = (props) => {
-  const { loggedIn, setLoggedIn } = props;
+  const { loggedIn, setLoggedIn, loading } = props;
   const [messageApi, contextHolder] = message.useMessage();
   const [reg, setReg] = React.useState(false);
 
@@ -26,26 +27,37 @@ const Profile = (props) => {
   const [pass, setPass] = React.useState("");
 
   const handleSubmit = () => {
-    fetch(`http://api.infriends.kz/login/`, {
+    fetch(`http://api.infriends.kz/login`, {
       method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
+      mode: "cors",
       body: JSON.stringify({
         login: log,
         password: pass,
       }),
     })
-      .then((r) => r.data)
+      .then((r) => {
+        console.log(r);
+        return r.json();
+      })
       .then((rInner) => {
-        messageApi.success("Вы успешно вошли!");
-        localStorage.setItem("login", log);
-        localStorage.setItem("id", rInner?.user);
-        setLoggedIn({
-          loggedIn: true,
-          login: log,
-          id: rInner?.user,
-        });
+        console.log(rInner);
+        if (rInner?.Msg !== "Bad Login or password") {
+          messageApi.success("Вы успешно вошли!");
+          localStorage.setItem("login", log);
+          localStorage.setItem("id", rInner?.user);
+          setLoggedIn({
+            loggedIn: true,
+            login: log,
+            id: rInner?.user,
+          });
+        } else {
+          messageApi.info(
+            "Сервис временно не доступен или учетные данные неверны!"
+          );
+          setLoggedIn({
+            loggedIn: false,
+          });
+        }
       })
       .catch((e) => {
         console.log(e);
@@ -76,9 +88,10 @@ const Profile = (props) => {
     <div>
       <Row>
         <Col span={24}>
-          <Form.Item label="Логин" labelCol={{ span: 24 }}>
+          <Form.Item label="Логин" auto labelCol={{ span: 24 }}>
             <Input
               placeholder="Введите логин..."
+              autoComplete="off"
               onChange={handleLog}
               style={{ width: "100%" }}
             ></Input>
@@ -91,6 +104,7 @@ const Profile = (props) => {
             <Input.Password
               placeholder="Введите пароль..."
               onChange={handlePass}
+              autoComplete="off"
               style={{ width: "100%" }}
             ></Input.Password>
           </Form.Item>
@@ -115,7 +129,7 @@ const Profile = (props) => {
     <Card>
       {contextHolder}
       {loggedIn?.loggedIn && (
-        <div>
+        <Spin spinning={loading}>
           <Space direction="vertical" style={{ width: "100%" }}>
             <Descriptions bordered>
               <Descriptions.Item label="Ваш логин" span={1}>
@@ -127,7 +141,7 @@ const Profile = (props) => {
             </Descriptions>
             <Button onClick={leave}>Выйти</Button>
           </Space>
-        </div>
+        </Spin>
       )}
       {!loggedIn?.loggedIn && node}
     </Card>

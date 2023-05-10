@@ -29,8 +29,8 @@ const TrackingList = (props) => {
   const [add, addTrack] = React.useState(false);
 
   React.useEffect(() => {
-    fetch(`http://api.infriends.kz/posylkas`)
-      .then((r) => r.data)
+    fetch(`http://api.infriends.kz/posylkas/?user=${loggedIn?.id}`)
+      .then((r) => r.json())
       .then((rInner) => {
         setPosylkas(rInner);
         if (rInner?.length === 0) setIsEmpty(true);
@@ -48,28 +48,30 @@ const TrackingList = (props) => {
   const handleSubmit = (e) => {
     fetch(`http://api.infriends.kz/create_order/`, {
       method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
+      mode: "cors",
       body: JSON.stringify({
         user: loggedIn?.id,
         pos_id: e?.idPos,
       }),
     })
-      .then((r) => r.data)
-      .then(() => {
-        messageApi.success("Заявка на создание отправлена!");
-        addTrack(false);
-        fetch(`http://api.infriends.kz/posylkas`)
-          .then((r) => r.data)
-          .then((rInner) => {
-            setPosylkas(rInner);
-            if (rInner?.length === 0) setIsEmpty(true);
-          })
-          .catch((e) => {
-            console.log(e);
-            setIsEmpty(true);
-          });
+      .then((r) => r.json())
+      .then((rInner) => {
+        if (rInner?.msg === "Ok") {
+          messageApi.success("Заявка на создание отправлена!");
+          addTrack(false);
+          fetch(`http://api.infriends.kz/posylkas/?user=${loggedIn?.id}`)
+            .then((r) => r.json())
+            .then((rInner) => {
+              setPosylkas(rInner);
+              if (rInner?.length === 0) setIsEmpty(true);
+            })
+            .catch((e) => {
+              console.log(e);
+              setIsEmpty(true);
+            });
+        } else {
+          messageApi.error(`Заявка на создание не отправлена!`);
+        }
       })
       .catch((e) => {
         messageApi.error(`Заявка на создание не отправлена! Ошибка: ${e}`);
@@ -109,9 +111,14 @@ const TrackingList = (props) => {
                       <Descriptions.Item label="Трекинг номер">
                         {x.pos_id}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Вес">1кг</Descriptions.Item>
+                      <Descriptions.Item label="Вес">
+                        {x.weight}
+                      </Descriptions.Item>
                       <Descriptions.Item label="Стоимость" span={2}>
-                        255 тг
+                        {x.cost}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Дата" span={2}>
+                        {x.date}
                       </Descriptions.Item>
                       <Descriptions.Item
                         label="Статус"
@@ -134,9 +141,14 @@ const TrackingList = (props) => {
                     <Descriptions.Item label="Трекинг номер">
                       {x.pos_id}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Вес">1кг</Descriptions.Item>
+                    <Descriptions.Item label="Вес">
+                      {x.weight}
+                    </Descriptions.Item>
                     <Descriptions.Item label="Стоимость" span={2}>
-                      255 тг
+                      {x.cost}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Дата" span={2}>
+                      {x.date}
                     </Descriptions.Item>
                     <Descriptions.Item
                       label="Статус"
