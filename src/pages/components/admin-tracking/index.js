@@ -15,6 +15,7 @@ import {
   message,
   Select,
   InputNumber,
+  Switch,
 } from "antd";
 
 import styles from "@/styles/Home.module.css";
@@ -35,6 +36,11 @@ const AdminTracking = (props) => {
 
   const [loading, setLoading] = React.useState(false);
   const [user, setUser] = React.useState(null);
+
+  const [addOrChange, setAddOrChange] = React.useState(false);
+  const [changeFound, setChangeFound] = React.useState(true);
+
+  const [idOfPos, setIdOfPos] = React.useState("");
 
   React.useEffect(() => {
     setLoading(true);
@@ -62,9 +68,29 @@ const AdminTracking = (props) => {
   }, []);
 
   React.useEffect(() => {
-    user && setPosList(user);
-    form.resetFields();
+    user ? setPosList(user) : setPosylkas(null);
+    form.resetFields(["from", "to", "idPos", "status", "weight"]);
   }, [user]);
+
+  React.useEffect(() => {
+    if (addOrChange && idOfPos && idOfPos.length === 13) {
+      const tempPosylka = posylkas.find((x) => x.pos_id === idOfPos);
+      if (tempPosylka) {
+        setChangeFound(true);
+        form.submit();
+        // const { weight, status, city_arrival, city_destination } = tempPosylka;
+        // form.setFieldValue("from", city_destination);
+        // form.setFieldValue("to", city_arrival);
+        // form.setFieldValue("status", status);
+        // form.setFieldValue("weight", weight);
+      } else {
+        messageApi.error(`Посылка не найдена!`);
+        form.resetFields(["from", "to", "idPos", "status", "weight"]);
+      }
+    } else {
+      setChangeFound(false);
+    }
+  }, [idOfPos]);
 
   const setPosList = () => {
     user &&
@@ -82,37 +108,72 @@ const AdminTracking = (props) => {
   };
 
   const handleSubmit = (e) => {
-    fetch(`http://api.infriends.kz/create_order/`, {
-      method: "POST",
-      mode: "cors",
-      body: JSON.stringify({
-        pos_id: e?.idPos,
-        user: user,
-        city_arrival: e?.from,
-        city_destination: e?.to,
-        status: e?.status,
-        weight: e?.weight,
-      }),
-    })
+    setLoading(true);
+    // if (e?.city_arrival === e?.city_destination) {
+    //   messageApi.error(`Города одинаковые!`);
+    //   return;
+    // }
+    fetch(
+      `http://api.infriends.kz/${addOrChange ? "change" : "create_order"}/`,
+      {
+        method: "POST",
+        mode: "cors",
+        body: JSON.stringify(
+          !addOrChange
+            ? {
+                pos_id: e?.idPos,
+                user: e?.userUser ?? user,
+                city_arrival: e?.to,
+                city_destination: e?.from,
+                status: e?.status,
+                weight: e?.weight,
+              }
+            : {
+                pos_id: e?.idPos,
+                city_arrival: e?.to,
+                city_destination: e?.from,
+                status: e?.status,
+                weight: e?.weight,
+              }
+        ),
+      }
+    )
       .then((r) => r.json())
       .then((rInner) => {
         if (rInner?.msg === "Ok") {
-          messageApi.success("Элемент создан!");
+          messageApi.success(
+            addOrChange ? "Элемент обновлен!" : "Элемент создан!"
+          );
           setPosList();
         } else {
-          messageApi.error(`Заявка на создание не отправлена!`);
+          messageApi.error(`Заявка на создание/обновление не отправлена!`);
         }
+        form.resetFields(["from", "to", "idPos", "status", "weight"]);
+        setLoading(false);
       })
       .catch((e) => {
-        messageApi.error(`Заявка на создание не отправлена! Ошибка: ${e}`);
+        form.resetFields(["from", "to", "idPos", "status", "weight"]);
+        messageApi.error(
+          `Заявка на создание/обновление не отправлена! Ошибка: ${e}`
+        );
         addTrack(false);
+        setLoading(false);
       });
   };
 
   const selectUser = (e) => {
     setUser(e);
+    form.setFieldValue("userUser", e);
   };
 
+  const handleSwitch = (e) => {
+    form.resetFields(["from", "to", "idPos", "status", "weight"]);
+    setAddOrChange(e);
+  };
+
+  const handleSearchOnChange = (e) => {
+    setIdOfPos(e.target.value);
+  };
   return (
     <Spin spinning={loading}>
       <Space direction="vertical" style={{ width: "100%" }}>
@@ -125,6 +186,18 @@ const AdminTracking = (props) => {
         >
           <Row gutter={[16, 8]}>
             <Col span={24}>
+              <Form.Item>
+                <Switch
+                  checkedChildren="Изменение"
+                  unCheckedChildren="Добавление"
+                  checked={addOrChange}
+                  onChange={handleSwitch}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 8]}>
+            <Col span={24}>
               <Form.Item
                 rules={[
                   {
@@ -132,6 +205,7 @@ const AdminTracking = (props) => {
                     message: "Пожалуйста выберите пользователя",
                   },
                 ]}
+                name={"userUser"}
                 label="Пользователь"
                 labelCol={{ span: 24 }}
               >
@@ -233,37 +307,41 @@ const AdminTracking = (props) => {
             </Col>
           </Row>
           <Row gutter={[16, 8]}>
-            <Col span={20}>
+            <Col span={addOrChange ? 24 : 20}>
               <Form.Item
                 rules={[
                   { required: true, message: "Пожалуйста заполните поле" },
                 ]}
                 name="idPos"
                 label="Индекс посылки"
+                onChange={handleSearchOnChange}
                 labelCol={{ span: 24 }}
               >
                 <Input
                   disabled={!user}
+                  maxLength={13}
                   placeholder="Введите значение..."
                 ></Input>
               </Form.Item>
             </Col>
-            <Col span={4}>
-              <Form.Item
-                // rules={[{ required: true, message: "Пожалуйста заполните поле" }]}
-                // name="idPos"
-                label="Отправка"
-                labelCol={{ span: 24 }}
-              >
-                <Button
-                  disabled={!user}
-                  onClick={() => form.submit()}
-                  style={{ width: "100%" }}
+            {!addOrChange && (
+              <Col span={4}>
+                <Form.Item
+                  // rules={[{ required: true, message: "Пожалуйста заполните поле" }]}
+                  // name="idPos"
+                  label="Отправка"
+                  labelCol={{ span: 24 }}
                 >
-                  Создать
-                </Button>
-              </Form.Item>
-            </Col>
+                  <Button
+                    disabled={!user}
+                    onClick={() => form.submit()}
+                    style={{ width: "100%" }}
+                  >
+                    Создать
+                  </Button>
+                </Form.Item>
+              </Col>
+            )}
           </Row>
           <Space
             direction="vertical"

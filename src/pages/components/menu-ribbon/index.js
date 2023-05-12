@@ -5,6 +5,7 @@ import {
   HomeOutlined,
   CalculatorOutlined,
   UserOutlined,
+  ApartmentOutlined
 } from "@ant-design/icons";
 
 import styles from "@/styles/Home.module.css";
@@ -36,6 +37,13 @@ const MenuRibbon = (props) => {
       <HomeOutlined {...homeButtonProps} />
       <CalculatorOutlined {...calcButtonProps} />
       <UserOutlined {...userButtonProps} />
+      {loggedIn && admin && (
+        <ApartmentOutlined
+          className={styles.calc}
+          onClick={loggedIn && admin ? () => setPage(4) : () => null}
+          disabled={!admin}
+        />
+      )}
       <Button
         style={{ justifyContent: "center", alignSelf: "center" }}
         onClick={() => {
@@ -43,13 +51,6 @@ const MenuRibbon = (props) => {
         }}
       >
         Админ
-      </Button>
-      <Button
-        style={{ justifyContent: "center", alignSelf: "center" }}
-        onClick={loggedIn && admin ? () => setPage(4) : () => null}
-        disabled={!admin}
-      >
-        Админ - Добавление посылок
       </Button>
     </Space>
   );

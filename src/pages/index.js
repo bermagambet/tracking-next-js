@@ -23,7 +23,7 @@ export default function Home() {
     loggedIn: false,
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setLoading(true);
     const logTemp = window.sessionStorage.getItem("login");
     const idTemp = window.sessionStorage.getItem("id");
@@ -36,7 +36,7 @@ export default function Home() {
     }
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const idTemp = window.sessionStorage.getItem("id");
     if (idTemp && idTemp !== "null") {
       fetch(`http://api.infriends.kz/is_admin/`, {
